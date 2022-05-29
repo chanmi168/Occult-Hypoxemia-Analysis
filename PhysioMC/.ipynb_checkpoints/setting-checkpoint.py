@@ -99,7 +99,7 @@ label_names = ['br', 'heart_rate_cosmed', 'rer', 'vco2_ml_min', 've', 'vo2_ml_mi
 R_highcutoff = 0.1
 
 # FILT_PPG = [0.35, 4]
-FILT_PPG = [1, 4]
+FILT_PPG = [1, 8]
 # FILT_ECG = [10, 30]
 FILT_ECG = [1, 30]
 # FILT_SCG = [1, 25]
@@ -111,3 +111,11 @@ FILT_RESP = [0.08, 1]
 # # FILT_ECG = [1, 30]
 # # FILT_SCG = [1, 25]
 # FILT_SCG = [5, 25]
+
+signal_quite_threshold = 0.3
+
+vital_yearoff = 30
+
+min_threshold = 5
+
+FS_RESAMPLE = 250

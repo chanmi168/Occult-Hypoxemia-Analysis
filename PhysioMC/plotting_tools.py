@@ -198,6 +198,16 @@ subject_palette = {
     126: '#8A3324'
 }
 
+legend_dict = {
+    0: 'White',
+    1: 'Black',
+}
+
+race_color_dict = {
+    'Caucasian or White': '#cc8963',
+    'African American  or Black': '#5975a4',
+}
+
 # sig_color_dict = {
 #     'ECG_biopac': 'Cyan',
 #     'PPG_biopac': 'Magenta',
@@ -289,7 +299,10 @@ Fitz_dict = {
     6: '#3B1F1B',
 }
 
-
+def ax_no_top_right(ax):
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    
 # def ax_no_top_right(ax):
 #     ax.spines['top'].set_visible(False)
 #     ax.spines['right'].set_visible(False)

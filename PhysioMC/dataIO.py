@@ -21,7 +21,7 @@ def data_loader(name, inputdir):
     return data
 
 def header_extract(header):
-    Fs = int(header[0].split(' ')[2])
+    Fs = float(header[0].split(' ')[2])
     N_sigs = int(header[0].split(' ')[1])
     start_time = header[0].split(' ')[4]
     date =  header[0].split(' ')[5].split('\n')[0] # TODO: check if this is birthday
@@ -56,7 +56,7 @@ def header_extract(header):
     }
     return header_dict
 
-def get_df_bed(rec_id, inputdir):
+def get_df_bed(rec_id, inputdir, header_id='0000'):
 
     # 1. get folder dir of the header and the waveform
 
@@ -66,7 +66,7 @@ def get_df_bed(rec_id, inputdir):
     subject_id = rec_id.split('-')[1]
 
     # header_id = recording_lookup[rec_id]
-    header_id = '0000'
+    # header_id = '0000'
     header_name = rec_id+'_{}.hea'.format(header_id)
     # header_name = rec_id+'_0n.hea'
     # A118-0520880083.hea
@@ -114,3 +114,59 @@ def get_df_bed(rec_id, inputdir):
 #     print('t_dur: {:.2f}s'.format(t_dur))
 
     return df_bed, header_dict
+
+def get_header_valid(inputdir_rec):
+
+    for header_name in sorted(os.listdir(inputdir_rec)):
+        if '.hea' not in header_name:
+            continue
+
+        if '_' not in header_name:
+            continue
+
+        if '_0n' in header_name:
+            continue
+        if 'layout' in header_name:
+            continue
+
+        # print(header_name)
+        headerdir = inputdir_rec + header_name
+
+
+        header_id = header_name.split('_')[-1].split('.hea')[0]
+
+
+        with open(headerdir, 'r') as f:
+            header = f.readlines()
+
+        header_dict = header_extract(header)
+
+
+        allheader_hours = int(header_id)*8
+        currentheader_hours = header_dict['t_dur(hr)']
+
+        # waveform_start = row['BED_LOCATION_START'] + timedelta(hours=allheader_hours)
+        # waveform_end = row['BED_LOCATION_START'] + timedelta(hours=allheader_hours) + timedelta(hours=currentheader_hours)
+
+        # using DateStart since it is the start time of the waveform
+        waveform_start = row['DateStart'] + timedelta(hours=allheader_hours)
+        waveform_end = row['DateStart'] + timedelta(hours=allheader_hours) + timedelta(hours=currentheader_hours)
+
+        header_dict['waveform_start'] = waveform_start
+        header_dict['waveform_end'] = waveform_end
+        header_dict['header_name'] = header_name
+        header_dict['header_id'] = header_id
+
+        if (waveform_start > row['times']) or (waveform_end < row['times']):
+            # print('wrong recording')
+            continue
+        else:
+            # print(header_start, header_end, row['times'])
+            # print('bingo!')
+            return header_dict
+
+
+        return None
+        # print('\t', header_dict['start_time'], header_dict['date'])
+
+    # header_id = header_name.split('_')[-1]

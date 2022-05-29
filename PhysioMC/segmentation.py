@@ -33,20 +33,6 @@ def beat_segmentation(sig, i_peaks, start_offset=-50, end_offset=250):
 
     return sig_beats, i_beat_peaks
 
-def get_filt_df(df_sync, Fs):
-    df = df_sync.copy()
-
-    for sig_name in df.columns:
-        if 'I' == sig_name or 'II' == sig_name or 'III' == sig_name or 'V' == sig_name:
-            df[sig_name] = get_padded_filt(df[sig_name].values, filter_padded=1, lowcutoff=FILT_ECG[0], highcutoff=FILT_ECG[1], Fs=Fs)
-        elif 'RR' == sig_name:
-            df[sig_name] = get_padded_filt_DSwrapper(df[sig_name].values, filter_padded=1, lowcutoff=FILT_RESP[0], highcutoff=FILT_RESP[1], Fs=Fs)
-        elif 'SPO2' == sig_name:
-            df[sig_name] = get_padded_filt(df[sig_name].values, filter_padded=1, lowcutoff=FILT_PPG[0], highcutoff=FILT_PPG[1], Fs=Fs)
-        else:
-            pass
-
-    return df
 
 # def get_filt_df(df_sync, Fs):
 
