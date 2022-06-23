@@ -29,6 +29,10 @@ label_range_dict = {
     'AmbTemp': [-10,35], # TODO: get ref, find unit
 }
 
+unit_dict = {
+    'Race String': '0: African American  or Black, 1: Caucasian or White',
+}
+
 # unit_dict = {
 #     'accel': 'g',
 #     'ppg': 'uW',
@@ -118,4 +122,6 @@ vital_yearoff = 30
 
 min_threshold = 5
 
-FS_RESAMPLE = 250
+FS_RESAMPLE = 100
+
+DEFAULT_ROC_thre = 0.5

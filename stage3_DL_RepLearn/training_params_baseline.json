@@ -1,0 +1,62 @@
+[
+  {
+      "model_name": "PPG_VAEcompressor",
+      "extractor_name": "Encoder",
+      "sweep_name": "baseline",
+      
+      "tiny_dataset": true,
+      "kernel_size": 10,
+      "channel_n": 4,
+      "num_epochs": 50,
+      "batch_size": 256,
+      "learning_rate": 0.001,
+      "cuda_i": 0,
+      "use_sc": true,
+      "fusion_type": "late",
+      "pooling_type": "avg_pooling",
+      
+      "stride": 2,
+      "pad_type": "reflect",
+      "kernels": {
+              "k1": 5,
+              "k2": 9,
+              "k3": 13},
+      "n_block": 5,
+      "dominantFreq_detect": "expectation",
+
+      "wandb": false,
+      "input_names": ["PPG"],
+      "feature_names": [],
+      "output_names": ["reconstruction"],
+      "meta_names": ["PAT_ID", "split_name"],
+      "activity_names": [1],
+      "output_dim": 1,
+      "loss_weights": {
+          "main_task": 1,
+          "auxillary_task": 1
+      },
+      "training_mode": "subject_ind",
+
+      "sweep_config": {
+          "program": "train_master.py",
+          "method": "grid",
+          "metric": {
+              "goal": "minimize",
+              "name": "val_MAE"},
+          "parameters": {
+              "loss_weights": {
+                  "values": [0, 100000, 1000000, 10000000]
+              },
+              "input_names": {
+                  "values": [["ECG_filt", "scgZ", "ppg_ir_2_cardiac"]]
+              },
+              "stride": {
+                  "values": [2,4]
+              },
+              "n_block": {
+                  "values": [2,4]
+              }
+          }
+      }      
+    }
+]

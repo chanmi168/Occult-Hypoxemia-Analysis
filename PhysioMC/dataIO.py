@@ -135,7 +135,6 @@ def get_header_valid(inputdir_rec):
 
         header_id = header_name.split('_')[-1].split('.hea')[0]
 
-
         with open(headerdir, 'r') as f:
             header = f.readlines()
 

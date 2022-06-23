@@ -733,9 +733,9 @@ def df_bed2PPGmatrix(df_bed, verbose=True):
     i_starts = np.arange(df.shape[0]//window_length)*window_length
     end_offset = window_length
     # # ECG segments
-    # sig_segments, i_start_final = beat_segmentation(df['I'], i_starts, start_offset=0, end_offset=window_length)
+    ECG_segments, i_start_final = beat_segmentation(df['I'], i_starts, start_offset=0, end_offset=window_length)
     # PPG segments
-    sig_segments, i_start_final = beat_segmentation(df['SPO2'], i_starts, start_offset=0, end_offset=window_length)
+    PPG_segments, i_start_final = beat_segmentation(df['SPO2'], i_starts, start_offset=0, end_offset=window_length)
 
     debug_message = '[perfecto]'
-    return sig_segments, debug_message
+    return PPG_segments, ECG_segments, debug_message
