@@ -83,7 +83,8 @@ class PPG_compressor(nn.Module):
         self.fc2 = nn.Linear(encoder_layer_dims[-1]*output_channels[-1], z_dim)
         self.fc3 = nn.Linear(z_dim, encoder_layer_dims[-1]*output_channels[-1])
 
-        self.UnFlatten = UnFlatten(N_ch=output_channels[-1], N_feature=encoder_layer_dims[-1])
+        # self.UnFlatten = UnFlatten(N_ch=output_channels[-1], N_feature=encoder_layer_dims[-1])
+        self.UnFlatten = UnFlatten(N_ch=1, N_feature=encoder_layer_dims[-1])
 
         self.main_task = self.output_names[0]
 
@@ -131,7 +132,7 @@ class PPG_compressor(nn.Module):
         for i, input_name in enumerate(self.encoders.keys()):
             feature_out[input_name] = self.encoders[input_name](x[:, [i], :])
             z = self.Flatten(feature_out[input_name])
-            
+            # print(z.size(), feature_out[input_name].size())
             # use linear layers to map to hidden dim for mu and logvar
             # z is the data sampled using mu, logvar (reparameterization), has the same dimension as feature_out[input_name]
             z, mu, logvar = self.bottleneck(z)
@@ -247,13 +248,13 @@ class VAELoss(nn.Module):
         
         losses['KLD'] = self.criterions['KLD'](kwargs['mu'], kwargs['logvar'])
 
-
         list_loss = []
         
         for output_name in list(output.keys()) + ['KLD']:
 #             print(output_name)
-            print(output_name,  self.loss_weights[ output_name.split('-')[0] ], losses[output_name] )
+            # print(output_name,  self.loss_weights[ output_name.split('-')[0] ], losses[output_name] )
             l = self.loss_weights[ output_name.split('-')[0] ] * losses[output_name] 
+            # print(output_name, l)
             list_loss.append(l)
 #             list_loss.append(self.loss_weights[ output_name.split('-')[0] ] * losses[output_name] for output_name in output.keys())
 
@@ -263,6 +264,8 @@ class VAELoss(nn.Module):
 
 #         losses['total'] = torch.sum(torch.stack([self.loss_weights[ output_name.split('-')[0] ] * losses[output_name] for output_name in output.keys()]))
 
+        # print(losses)
+        # sys.exit()
         return losses
 
     

@@ -35,6 +35,8 @@ def plot_losses(CV_dict, show_plot=False, outputdir=None):
 #     total_loss_val = np.sqrt(CV_dict['total_loss_val'])
     
     metric_names = list(df_losses_train.columns)
+    # print(metric_names)
+    # sys.exit()
     fig, axes = plt.subplots(len(metric_names),1, figsize=(5, len(metric_names)), dpi=80)
     
     fontsize = 10
@@ -50,9 +52,9 @@ def plot_losses(CV_dict, show_plot=False, outputdir=None):
 
     fig.tight_layout()
 
-    subject_id = CV_dict['subject_id_val']
+    i_CV = CV_dict['CV']
     #     fig_name = '{}_signl_{}'.format(title_str,subject_id)
-    fig_name = 'loss_CV{}'.format(subject_id)
+    fig_name = 'loss_CV{}'.format(i_CV)
 #     show_plot=True
     if outputdir is not None:
         if not os.path.exists(outputdir):

@@ -35,6 +35,8 @@ def plot_losses(CV_dict, show_plot=False, outputdir=None):
 #     total_loss_val = np.sqrt(CV_dict['total_loss_val'])
     
     metric_names = list(df_losses_train.columns)
+    # print(metric_names)
+    # sys.exit()
     fig, axes = plt.subplots(len(metric_names),1, figsize=(5, len(metric_names)), dpi=80)
     
     fontsize = 10

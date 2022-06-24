@@ -37,7 +37,7 @@ def train_dann(model, dataloader, training_params):
     # total_AE = dict.fromkeys(training_params['model_out_names'], 0)
     # total_AE = {k:v for k,v in total_AE.items() if 'domain' not in k}
 
-    total_losses = dict.fromkeys(training_params['model_out_names']+['total'], 0)
+    total_losses = dict.fromkeys(training_params['model_out_names']+['total']+['KLD'], 0)
 
 
     model.train()
@@ -112,33 +112,52 @@ def train_dann(model, dataloader, training_params):
 
 
 #     total_loss = total_loss/dataset_size
-    for loss_name in total_losses.keys():
-        total_losses[loss_name] == total_losses[loss_name]/dataset_size
+    # for loss_name in total_losses.keys():
+    #     total_losses[loss_name] == total_losses[loss_name]/dataset_size
             
     # subject_id = training_params['CV_config']['subject_id']
     
-    log_dict = {}
-    # for AE_names in total_AE.keys():
-    #     log_dict['[{}] train_{}'.format(subject_id, AE_names)] = total_AE[AE_names]/dataset_size
+    
+    performance_dict = {}
+    for loss_name in total_losses.keys():
+        performance_dict['train_{}'.format(loss_name)] = total_losses[loss_name]
 
-    log_dict['epoch'] = epoch
+    performance_dict['epoch'] = epoch
+    
     
     if training_params['wandb']==True:
         # W&B
-        wandb.log(log_dict)
-#         wandb.log({
-# #             '[{}] train_loss'.format(subject_id): total_loss, 
-#             '[{}] train_MAE'.format(subject_id): MAE, 
-#             'epoch': epoch, })
+        wandb.log(performance_dict)
     
+#     performance_dict = {'total_loss': total_loss,
+#                        }
+    # performance_dict = total_losses
     
-    # # TODO: remove performance_dict
-#     performance_dict = {
-#         'total_loss': total_loss,
-#     }
-    performance_dict = total_losses
-
     return performance_dict
+
+#     log_dict = {}
+#     for loss_name in total_losses.keys():
+#         log_dict['train_{}'.format(subject_id, loss_name)] = total_losses[loss_name]
+
+#     log_dict['epoch'] = epoch
+    
+    
+#     if training_params['wandb']==True:
+#         # W&B
+#         wandb.log(log_dict)
+# #         wandb.log({
+# # #             '[{}] train_loss'.format(subject_id): total_loss, 
+# #             '[{}] train_MAE'.format(subject_id): MAE, 
+# #             'epoch': epoch, })
+    
+    
+#     # # TODO: remove performance_dict
+# #     performance_dict = {
+# #         'total_loss': total_loss,
+# #     }
+#     performance_dict = total_losses
+
+#     return performance_dict
 
 
 # def eval_resnet(model, dataloader, optimizer, criterion, epoch, training_params):
@@ -154,7 +173,7 @@ def eval_dann(model, dataloader, training_params):
 
 #     total_loss = 0
 
-    total_losses = dict.fromkeys(training_params['model_out_names']+['total'], 0)
+    total_losses = dict.fromkeys(training_params['model_out_names']+['total']+['KLD'], 0)
 
     
 #     total_AE = {}
@@ -213,25 +232,28 @@ def eval_dann(model, dataloader, training_params):
 #             '[{}] val_MAE'.format(subject_id): MAE, 
 #             'epoch': epoch, })
 
+
+
 #     total_loss = total_loss/dataset_size
-    for loss_name in total_losses.keys():
-        total_losses[loss_name] == total_losses[loss_name]/dataset_size
+    # for loss_name in total_losses.keys():
+    #     total_losses[loss_name] == total_losses[loss_name]
             
     # subject_id = training_params['CV_config']['subject_id']
     
-    log_dict = {}
-    # for AE_names in total_AE.keys():
-    #     log_dict['[{}] val_{}'.format(subject_id, AE_names)] = total_AE[AE_names]/dataset_size
+    performance_dict = {}
+    for loss_name in total_losses.keys():
+        performance_dict['val_{}'.format(loss_name)] = total_losses[loss_name]
 
-    log_dict['epoch'] = epoch
+    performance_dict['epoch'] = epoch
+    
     
     if training_params['wandb']==True:
         # W&B
-        wandb.log(log_dict)
+        wandb.log(performance_dict)
     
 #     performance_dict = {'total_loss': total_loss,
 #                        }
-    performance_dict = total_losses
+    # performance_dict = total_losses
     
     return performance_dict
 
@@ -243,6 +265,7 @@ def pred_dann(model, dataloader, training_params):
 
     optimizer = training_params['optimizer']
     criterion = training_params['criterion']
+    # print(criterion)
     epoch = training_params['epoch']
     
     device = torch.device('cuda:{}'.format(int(training_params['cuda_i'])) if torch.cuda.is_available() else 'cpu')
@@ -250,7 +273,7 @@ def pred_dann(model, dataloader, training_params):
     dataset_size = len(dataloader.dataset)
 
 #     total_loss = 0
-    total_losses = dict.fromkeys(training_params['model_out_names']+['total'], 0)
+    total_losses = dict.fromkeys(training_params['model_out_names']+['total']+['KLD'], 0)
 
 #     out_arr = np.empty(0)
 #     label_arr = np.empty(0)
@@ -302,10 +325,11 @@ def pred_dann(model, dataloader, training_params):
         # 4. compute the class loss of features
 #         total_loss += loss.data.detach().cpu().numpy()
 
-
+        # print(losses)
         # 4. accumulate the loss
         for loss_name in total_losses.keys():
             total_losses[loss_name] += losses[loss_name].data.detach().cpu().numpy()
+            # print(loss_name)
             
 
 
@@ -370,13 +394,13 @@ def pred_dann(model, dataloader, training_params):
                        }
     
 
-    for loss_name in total_losses.keys():
-        total_losses[loss_name] == total_losses[loss_name]/dataset_size
+    # for loss_name in total_losses.keys():
+    #     total_losses[loss_name] == total_losses[loss_name]
     
     performance_dict = Merge(performance_dict, total_losses)
 
-    
     return performance_dict
+
 
 
 # TODO: implement this based on model_features_diagnosis
