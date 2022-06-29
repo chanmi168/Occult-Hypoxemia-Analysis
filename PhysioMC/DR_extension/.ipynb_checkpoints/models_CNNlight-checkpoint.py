@@ -152,14 +152,18 @@ class Encoder(nn.Module):
         self.encoder_layer_dims = encoder_layer_dims
         self.last_layer_dim = last_layer_dim
         
-        self.ch_pooling = torch.nn.Conv1d(self.output_channels[-1], 1, 1)
-        self.input_channels.append(self.output_channels[-1])
-        self.output_channels.append(1)
+        # self.ch_pooling = torch.nn.Conv1d(self.output_channels[-1], 1, 1)
+        z_dim = training_params['bottleneck_dim']
+        self.condenser = torch.nn.Conv1d(self.output_channels[-1], z_dim, kernel_size=self.encoder_layer_dims[-1], stride=1)
+
+        
+        # self.input_channels.append(self.output_channels[-1])
+        # self.output_channels.append(1)
     
         # VAE: transform hidden features to mean and variance
-        self.relu = torch.nn.ReLU()
-        self.encode_mean = torch.nn.Linear(last_layer_dim*1, 25)
-        self.encode_logvar = torch.nn.Linear(last_layer_dim*1, 25)
+        # self.relu = torch.nn.ReLU()
+        # self.encode_mean = torch.nn.Linear(last_layer_dim*1, 25)
+        # self.encode_logvar = torch.nn.Linear(last_layer_dim*1, 25)
 
         self.feature_out_dim = self.last_layer_dim * self.output_channels[-1]
 
@@ -178,7 +182,8 @@ class Encoder(nn.Module):
                 print('i_block: {0}, in_channels: {1}, out_channels: {2}, out dim: {3}'.format(i_block, net.input_channel, net.output_channel, out.size()))
             # print(i_block, out.size())
 
-        out = self.ch_pooling(out)
+        out = self.condenser(out)
+        # out = self.ch_pooling(out)
 
         debug = False
         if debug == True:
@@ -204,7 +209,8 @@ class Decoder(torch.nn.Module):
         if input_channel is None:
             input_channel = training_params['data_dimensions'][0]
 
-        input_dim = encoder_layer_dims[-1]
+        self.encoder_layer_dims = encoder_layer_dims
+        input_dim = self.encoder_layer_dims[-1]
         channel_n = training_params['channel_n']
         stride = training_params['stride']
         
@@ -213,8 +219,18 @@ class Decoder(torch.nn.Module):
 
         self.n_block = training_params['n_block']
         in_ch = input_channel
+        
+        # self.decondenser = torch.nn.Conv1d(z_dim, self.encoder_channels[-1], kernel_size=self.last_layer_dim[-1], stride=1)
+
+        z_dim = training_params['bottleneck_dim']
+        self.decondenser = torch.nn.ConvTranspose1d(z_dim, self.encoder_channels[-1], kernel_size=self.encoder_layer_dims[-1], stride=1)
 
         self.basicblock_list = nn.ModuleList()
+        
+        # self.basicblock_list.append(decondenser)
+
+        # self.basicblock_list.append(InceptionBlock(training_params, stride=1, input_channel=1, output_channel=self.encoder_channels[-1], is_conv=False, outsize=input_dim))
+
 
         for i_block in range(self.n_block):
             outsize = encoder_layer_dims[self.n_block-i_block-1] # ignore the last dimension
@@ -237,9 +253,12 @@ class Decoder(torch.nn.Module):
     def forward(self, x):   
 
         out = x.float()
+        
+        out = self.decondenser(out)
 
         for i_block in range(len(self.basicblock_list)):
             net = self.basicblock_list[i_block]
+            # print(out.size())
             out = net(out)
             if self.verbose:
                 print('i_block: {0}, in_channels: {1}, out_channels: {2}, out dim: {3}'.format(i_block, net.input_channel, net.output_channel, out.size()))

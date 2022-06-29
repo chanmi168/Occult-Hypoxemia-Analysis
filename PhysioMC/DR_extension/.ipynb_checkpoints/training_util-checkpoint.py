@@ -297,6 +297,8 @@ def pred_dann(model, dataloader, training_params):
 
     feature_arr = []
     meta_arr = []
+    feature_arr = []
+    meta_arr = []
     
     model.eval()
 #     print('\t\tswitch model to eval')
@@ -363,6 +365,8 @@ def pred_dann(model, dataloader, training_params):
         feature_arr.append( feature.detach().cpu().numpy())
         meta_arr.append( meta.detach().cpu().numpy())
 
+        mu_arr.append( mu.detach().cpu().numpy())
+        logvar_arr.append( logvar.detach().cpu().numpy())
 
 
 #     print(out_dict[output_name])

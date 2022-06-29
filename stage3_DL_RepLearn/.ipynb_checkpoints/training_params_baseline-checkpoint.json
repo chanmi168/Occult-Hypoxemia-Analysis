@@ -4,10 +4,10 @@
       "extractor_name": "Encoder",
       
       "tiny_dataset": true,
-      "verbose": true,
+      "verbose": false,
       "kernel_size": 10,
       "channel_n": 4,
-      "num_epochs": 50,
+      "num_epochs": 3,
       "batch_size": 256,
       "learning_rate": 0.001,
       "cuda_i": 0,
@@ -21,7 +21,8 @@
               "k1": 5,
               "k2": 9,
               "k3": 13},
-      "n_block": 3,
+      "n_block": 7,
+      "bottleneck_dim": 10,
       "dominantFreq_detect": "expectation",
 
       "wandb": false,
@@ -33,7 +34,7 @@
       "output_dim": 1,
       "loss_weights": {
           "main_task": 1,
-          "auxillary_task": 1
+          "auxillary_task": 0.1
       },
       "training_mode": "subject_ind",
 

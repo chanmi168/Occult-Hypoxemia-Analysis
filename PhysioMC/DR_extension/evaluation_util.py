@@ -36,6 +36,7 @@ def plot_losses(CV_dict, show_plot=False, outputdir=None):
     
     metric_names = list(df_losses_train.columns)
     # print(metric_names)
+    # print(list(df_losses_val.columns))
     # sys.exit()
     fig, axes = plt.subplots(len(metric_names),1, figsize=(5, len(metric_names)), dpi=80)
     
@@ -43,7 +44,7 @@ def plot_losses(CV_dict, show_plot=False, outputdir=None):
 
     for ax, metric_name in zip(axes, metric_names):
         ax.plot(df_losses_train[metric_name].values, 'r', label='train')
-        ax.plot(df_losses_val[metric_name].values,'b', label='val')
+        ax.plot(df_losses_val[metric_name.replace('train', 'val')].values,'b', label='val')
         ax.legend(loc='upper right', frameon=True, fontsize=fontsize*0.8)
 
         ax.set_xlabel('epoch', fontsize=fontsize)

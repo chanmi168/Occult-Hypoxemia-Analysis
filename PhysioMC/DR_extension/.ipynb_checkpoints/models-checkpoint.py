@@ -36,6 +36,9 @@ class PPG_compressor(nn.Module):
         
         input_dim = training_params['data_dimensions'][-1]
         self.input_names = training_params['input_names']
+        
+        self.verbose = training_params['verbose']
+
 
         input_channel = training_params['data_dimensions'][0]
         channel_n = training_params['channel_n']
@@ -78,13 +81,21 @@ class PPG_compressor(nn.Module):
         
         self.Flatten = Flatten()
 
-        z_dim = 25
-        self.fc1 = nn.Linear(encoder_layer_dims[-1]*output_channels[-1], z_dim)
-        self.fc2 = nn.Linear(encoder_layer_dims[-1]*output_channels[-1], z_dim)
-        self.fc3 = nn.Linear(z_dim, encoder_layer_dims[-1]*output_channels[-1])
+        z_dim = training_params['bottleneck_dim']
+        self.fc1 = nn.Linear(z_dim, z_dim)
+        self.fc2 = nn.Linear(z_dim, z_dim)
+        self.fc3 = nn.Linear(z_dim, z_dim)
+        # self.fc1 = nn.Linear(encoder_layer_dims[-1]*1, z_dim)
+        # self.fc2 = nn.Linear(encoder_layer_dims[-1]*1, z_dim)
+        # self.fc3 = nn.Linear(z_dim, encoder_layer_dims[-1]*1)
+        # self.fc1 = nn.Linear(encoder_layer_dims[-1]*output_channels[-1], z_dim)
+        # self.fc2 = nn.Linear(encoder_layer_dims[-1]*output_channels[-1], z_dim)
+        # self.fc3 = nn.Linear(z_dim, encoder_layer_dims[-1]*output_channels[-1])
 
+        # self.UnFlatten = UnFlatten(N_ch=1, N_feature=z_dim)
+        self.UnFlatten = UnFlatten(N_ch=z_dim, N_feature=1)
+        # self.UnFlatten = UnFlatten(N_ch=1, N_feature=encoder_layer_dims[-1])
         # self.UnFlatten = UnFlatten(N_ch=output_channels[-1], N_feature=encoder_layer_dims[-1])
-        self.UnFlatten = UnFlatten(N_ch=1, N_feature=encoder_layer_dims[-1])
 
         self.main_task = self.output_names[0]
 
@@ -137,15 +148,16 @@ class PPG_compressor(nn.Module):
             # z is the data sampled using mu, logvar (reparameterization), has the same dimension as feature_out[input_name]
             z, mu, logvar = self.bottleneck(z)
             
-            latent[input_name] = z # give it back its channel dim
+            latent[input_name] = z
             latent[input_name] = self.fc3(latent[input_name])
             # latent[input_name] = latent[input_name][:, None, :]
 
             
             latent[input_name] = self.UnFlatten(latent[input_name])
 
+            if self.verbose:
+                print('feature_out dim: {}, z dim: {}, latent dim: {}'.format(feature_out[input_name].size(), z.size(), latent[input_name].size()))
 
-    
             
             if self.main_task=='reconstruction':
                 # # for regressor_name in self.classifiers.keys():
