@@ -107,9 +107,32 @@ def bytestoint(byte):
         return data
    
     #return int.from_bytes(byte + b'\x00\x00', "big",signed=True) >> 16
-       
 
 def parse(data, header = True, print_updates = False, isConvUnits = True):
+    """
+    This is the parsing script provided by Cardiosense 
+    Author: Michael Chan (mchan81@gatech.edu)
+    Cardiosense rep: Venu Ganti (venu@cardiosense.com)
+    
+    TODO: This code is still not very well organized. Please package this script better.
+    Versions 1.1.0
+    
+    Input:
+        fileContent - bytes read from the file
+        header - bytes read from the file
+        print_updates - print parsing information (e.g., speed, data size, etc.)
+        isConvUnits - if True, converts acceleration binary code to accleration units (g)
+
+    Usage:
+        file = open(fileName, mode='rb') # open the .bin file exported from the patch using the Cardiosense software
+        fileContent = file.read() # specified number of bytes from the file
+        patch_dict = parse(fileContent, header = True, print_updates = True, isConvUnits = True)
+
+    Release Notes:
+        Version 1.0.0 (2022): Initial release
+        Version 1.1.0 (2023/02/25): Fixed an issue, Red and Green PPG are swapped. In your own dataset, please check the perfusion index (PI) of your subjects during baseline. For your reference: Range of PI for red ≈ [0.05, 0.07]. Range of PI for green ≈ [0.56, 0.6]. Range of PI for infrared ≈ [0.08, 0.10]. All of the changes can be found by searching the key word "Edited on 2023/02/25"
+    """
+
     time1 = time.time()
 
     AST_SR = 16384/(2*2)
@@ -240,38 +263,68 @@ def parse(data, header = True, print_updates = False, isConvUnits = True):
             if ppg_ir_1[ppg_count] > 524288:
                 ppg_ir_1[ppg_count] -= 1048576
             ind += 3
-            ppg_g_1[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
-            if ppg_g_1[ppg_count] > 524288:
-                ppg_g_1[ppg_count] -= 1048576
-            ind += 3
+            # Red and Green were incorrectly labeled. Edited on 2023/02/25
             ppg_r_1[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
             if ppg_r_1[ppg_count] > 524288:
                 ppg_r_1[ppg_count] -= 1048576
+            ind += 3
+            # Red and Green were incorrectly labeled. Edited on 2023/02/25
+            ppg_g_1[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
+            if ppg_g_1[ppg_count] > 524288:
+                ppg_g_1[ppg_count] -= 1048576
+            # ind += 3
+            # ppg_g_1[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
+            # if ppg_g_1[ppg_count] > 524288:
+            #     ppg_g_1[ppg_count] -= 1048576
+            # ind += 3
+            # ppg_r_1[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
+            # if ppg_r_1[ppg_count] > 524288:
+            #     ppg_r_1[ppg_count] -= 1048576
+                
+                
             ind += 3
             ppg_ir_2[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
             if ppg_ir_2[ppg_count] > 524288:
                 ppg_ir_2[ppg_count] -= 1048576
             ind += 3
-            ppg_g_2[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
-            if ppg_g_2[ppg_count] > 524288:
-                ppg_g_2[ppg_count] -= 1048576
-            ind += 3
+            # Red and Green were incorrectly labeled. Edited on 2023/02/25
             ppg_r_2[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
             if ppg_r_2[ppg_count] > 524288:
                 ppg_r_2[ppg_count] -= 1048576
             ind += 3
+            # Red and Green were incorrectly labeled. Edited on 2023/02/25
+            ppg_g_2[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
+            if ppg_g_2[ppg_count] > 524288:
+                ppg_g_2[ppg_count] -= 1048576
+            # ind += 3
+            # ppg_g_2[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
+            # if ppg_g_2[ppg_count] > 524288:
+            #     ppg_g_2[ppg_count] -= 1048576
+            # ind += 3
+            # ppg_r_2[ppg_count] = int.from_bytes(bytes([data[ind] & 0x0F])+data[ind+1:ind+3], "big")
+            # if ppg_r_2[ppg_count] > 524288:
+            #     ppg_r_2[ppg_count] -= 1048576
+            ind += 3
             ppg_time[ppg_count] = time_temp
             ppg_ir_1_current[ppg_count] = int.from_bytes(data[ind:ind+1], "little")
             ind += 1
-            ppg_g_1_current[ppg_count] = int.from_bytes(data[ind:ind+1], "little")
-            ind += 1
+            # Red and Green were incorrectly labeled. Edited on 2023/02/25
             ppg_r_1_current[ppg_count] = int.from_bytes(data[ind:ind+1], "little")
+            # ppg_g_1_current[ppg_count] = int.from_bytes(data[ind:ind+1], "little")
+            ind += 1
+            # Red and Green were incorrectly labeled. Edited on 2023/02/25
+            ppg_g_1_current[ppg_count] = int.from_bytes(data[ind:ind+1], "little")
+            # ppg_r_1_current[ppg_count] = int.from_bytes(data[ind:ind+1], "little")
             ind += 1
             ppg_ir_2_current[ppg_count] = int.from_bytes(data[ind:ind+1], "little")
             ind += 1
-            ppg_g_2_current[ppg_count] = data[ind]
+            # Red and Green were incorrectly labeled. Edited on 2023/02/25
+            ppg_r_2_current[ppg_count] = data[ind]
+            # ppg_g_2_current[ppg_count] = data[ind]
             ind += 1
-            ppg_r_2_current[ppg_count] = int.from_bytes(data[ind:ind+1], "little")
+            # Red and Green were incorrectly labeled. Edited on 2023/02/25
+            ppg_g_2_current[ppg_count] = int.from_bytes(data[ind:ind+1], "little")
+            # ppg_r_2_current[ppg_count] = int.from_bytes(data[ind:ind+1], "little")
             ind += 1
             ppg_count += 1
         if flag & 0x08:

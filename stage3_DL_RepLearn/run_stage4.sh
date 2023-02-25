@@ -3,9 +3,10 @@
 set -e
 set -u
 
-inputdir="../../data/stage3_DL_RepLearn/"
+inputdir="../../data/stage3_DL_prepare/"
 outputdir="../../data/stage3_DL_RepLearn/"
-training_params_file="training_params_dummy.json"
+
+training_params_file="training_params_baseline.json"
 
 echo "===================================== running stage 4 [regression]  ====================================="
 mkdir -p $outputdir
